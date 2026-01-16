@@ -9,59 +9,77 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev")
 
-def gen_code(n=6):
-    alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
-    return "".join(secrets.choice(alphabet) for _ in range(n))
 
-@app.get("/")
+@app.route("/")
 def index():
-    lessons = db.fetch_all("SELECT id, code, title, created_at FROM lessons ORDER BY created_at DESC")
-    return render_template("index.html", lessons=lessons)
-
-@app.post("/lessons/create")
-def create_lesson():
-    title = request.form.get("title", "").strip()
-    if not title:
-        return redirect(url_for("index"))
-
-    code = gen_code()
-    db.execute("INSERT INTO lessons (code, title) VALUES (%s, %s)", [code, title])
-    return redirect(url_for("index"))
-
-@app.get("/lessons/<code>")
-def lesson_page(code: str):
-    lesson = db.fetch_one("SELECT id, code, title FROM lessons WHERE code=%s", [code.upper()])
-    if not lesson:
-        return "Lesson not found", 404
-
-    stats = db.fetch_one("""
-        SELECT
-          AVG(rating)::float AS avg_rating,
-          SUM(CASE WHEN mood='like' THEN 1 ELSE 0 END) AS like_count,
-          SUM(CASE WHEN mood='ok' THEN 1 ELSE 0 END) AS ok_count,
-          SUM(CASE WHEN mood='dislike' THEN 1 ELSE 0 END) AS dislike_count,
-          COUNT(*) AS total
-        FROM feedback
-        WHERE lesson_id=%s
-    """, [lesson["id"]])
-
-    questions = db.fetch_all(
-        "SELECT text, created_at FROM questions WHERE lesson_id=%s ORDER BY created_at DESC",
-        [lesson["id"]]
+    lessons = db.fetch_all(
+        "SELECT id, code, title, created_at FROM lessons ORDER BY created_at DESC"
     )
 
-    comments = db.fetch_all(
-        "SELECT comment, mood, rating, created_at FROM feedback WHERE lesson_id=%s AND comment IS NOT NULL ORDER BY created_at DESC",
-        [lesson["id"]]
+    total_feedback = db.fetch_one(
+        "SELECT COUNT(*) AS cnt FROM feedback"
+    )["cnt"]
+
+    avg_rating = db.fetch_one(
+        "SELECT COALESCE(AVG(rating), 0) AS avg FROM feedback"
+    )["avg"]
+
+    return render_template(
+        "index.html",
+        lessons=lessons,
+        total_feedback=total_feedback,
+        avg_rating=round(avg_rating, 2)
+    )
+
+
+@app.route("/lesson/<int:lesson_id>")
+def lesson_page(lesson_id):
+    lesson = db.fetch_one(
+        "SELECT * FROM lessons WHERE id=%s",
+        [lesson_id]
+    )
+
+    # Общая статистика по настроению
+    stats = db.fetch_one(
+        """
+        SELECT
+            COUNT(*) AS total,
+            COALESCE(AVG(rating), 0)::float AS avg_rating,
+            COALESCE(SUM(CASE WHEN mood='like' THEN 1 ELSE 0 END), 0) AS like_count,
+            COALESCE(SUM(CASE WHEN mood='ok' THEN 1 ELSE 0 END), 0) AS ok_count,
+            COALESCE(SUM(CASE WHEN mood='dislike' THEN 1 ELSE 0 END), 0) AS dislike_count
+        FROM feedback
+        WHERE lesson_id=%s
+        """,
+        [lesson_id]
+    )
+
+    # Распределение оценок (1–5)
+    rating_stats = db.fetch_all(
+        """
+        SELECT rating, COUNT(*) AS count
+        FROM feedback
+        WHERE lesson_id=%s AND rating IS NOT NULL
+        GROUP BY rating
+        ORDER BY rating
+        """,
+        [lesson_id]
+    )
+
+    # Анонимные вопросы
+    questions = db.fetch_all(
+        "SELECT text FROM questions WHERE lesson_id=%s",
+        [lesson_id]
     )
 
     return render_template(
         "lesson.html",
         lesson=lesson,
         stats=stats,
-        questions=questions,
-        comments=comments
+        rating_stats=rating_stats,
+        questions=questions
     )
 
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

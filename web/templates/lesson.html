@@ -1,78 +1,139 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <title>{{ lesson.title }}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <title>{{ lesson.title }}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Chart.js — библиотека для графиков -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-<div class="container">
+<header class="top-bar">
+    <h1>📘 {{ lesson.title }}</h1>
+    <button id="theme-toggle">🌙</button>
+</header>
 
-  <a class="back" href="/">← Назад</a>
-
-  <h1>{{ lesson.title }}</h1>
-  <p>Код урока: <b>{{ lesson.code }}</b></p>
-
-  <div class="card {% if stats.dislike_count > stats.like_count %}problem{% endif %}">
-    <h2>Статистика</h2>
-
-    <p>Всего ответов: <b>{{ stats.total or 0 }}</b></p>
-
-    <p>Средняя оценка:</p>
-    <div class="rating-scale">
-      {% for i in range(1, 6) %}
-        <div class="rating-dot {% if stats.avg_rating and i <= stats.avg_rating|round(0, 'floor') %}active{% endif %}"></div>
-      {% endfor %}
+<!-- ===== Основные цифры ===== -->
+<section class="stats">
+    <div class="stat-card">
+        <h3>📝 Всего оценок</h3>
+        <p>{{ stats.total }}</p>
     </div>
 
-    <div class="chart">
-      <p>👍 Понятно ({{ stats.like_count or 0 }})</p>
-      <div class="bar">
-        <div class="bar-fill bar-like"
-             style="width: {{ (stats.like_count / stats.total * 100) if stats.total else 0 }}%">
-        </div>
-      </div>
-
-      <p>😐 Средне ({{ stats.ok_count or 0 }})</p>
-      <div class="bar">
-        <div class="bar-fill bar-ok"
-             style="width: {{ (stats.ok_count / stats.total * 100) if stats.total else 0 }}%">
-        </div>
-      </div>
-
-      <p>👎 Непонятно ({{ stats.dislike_count or 0 }})</p>
-      <div class="bar">
-        <div class="bar-fill bar-dislike"
-             style="width: {{ (stats.dislike_count / stats.total * 100) if stats.total else 0 }}%">
-        </div>
-      </div>
+    <div class="stat-card">
+        <h3>⭐ Средняя оценка</h3>
+        <p>{{ stats.avg_rating|round(1) }}</p>
     </div>
-  </div>
+</section>
 
-  <div class="card">
-    <h2>Анонимные вопросы</h2>
-    <ul>
-      {% for q in questions %}
-        <li>{{ q.text }}</li>
-      {% else %}
-        <li>Пока вопросов нет</li>
-      {% endfor %}
-    </ul>
-  </div>
+<!-- ===== Графики ===== -->
+<section class="analysis">
 
-  <div class="card">
-    <h2>Оценки</h2>
-    <ul>
-      {% for c in comments %}
-        <li>({{ c.mood }}, {{ c.rating }}/5) — {{ c.comment }}</li>
-      {% else %}
-        <li>Пока оценок нет</li>
-      {% endfor %}
-    </ul>
-  </div>
+    <!-- ГРАФИК 1: настроение -->
+    <div class="card">
+        <h3>📊 Настроение класса</h3>
+        <canvas id="moodChart"></canvas>
+    </div>
 
+    <!-- ГРАФИК 2: оценки -->
+    <div class="card">
+        <h3>⭐ Распределение оценок</h3>
+        <canvas id="ratingChart"></canvas>
+    </div>
+
+    <!-- Анонимные вопросы -->
+    <div class="card">
+        <h3>❓ Анонимные вопросы</h3>
+
+        {% if questions %}
+            <ul>
+                {% for q in questions %}
+                    <li>{{ q.text }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Вопросов пока нет.</p>
+        {% endif %}
+    </div>
+
+</section>
+
+<div class="back">
+    <a href="{{ url_for('index') }}">← Вернуться к списку уроков</a>
 </div>
+
+<footer>
+    🔒 Все отзывы и вопросы отправлены анонимно
+</footer>
+
+<script>
+/* ===== ТЁМНАЯ ТЕМА ===== */
+const toggleBtn = document.getElementById("theme-toggle");
+
+if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark");
+    toggleBtn.textContent = "☀️";
+}
+
+toggleBtn.onclick = () => {
+    document.body.classList.toggle("dark");
+    localStorage.setItem(
+        "theme",
+        document.body.classList.contains("dark") ? "dark" : "light"
+    );
+    toggleBtn.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+};
+
+
+/* ===== ГРАФИК 1: КРУГОВАЯ ДИАГРАММА ===== */
+new Chart(document.getElementById("moodChart"), {
+    type: "pie",
+    data: {
+        labels: ["Понятно 👍", "Средне 😐", "Непонятно 👎"],
+        datasets: [{
+            data: [
+                {{ stats.like_count }},
+                {{ stats.ok_count }},
+                {{ stats.dislike_count }}
+            ],
+            backgroundColor: ["#22c55e", "#facc15", "#ef4444"]
+        }]
+    }
+});
+
+
+/* ===== ГРАФИК 2: СТОЛБЧАТЫЙ ===== */
+const ratingLabels = [];
+const ratingCounts = [];
+
+{% for row in rating_stats %}
+    ratingLabels.push("{{ row.rating }} ⭐");
+    ratingCounts.push({{ row.count }});
+{% endfor %}
+
+new Chart(document.getElementById("ratingChart"), {
+    type: "bar",
+    data: {
+        labels: ratingLabels,
+        datasets: [{
+            label: "Количество учеников",
+            data: ratingCounts,
+            backgroundColor: "#4a6cf7"
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1 }
+            }
+        }
+    }
+});
+</script>
 
 </body>
 </html>

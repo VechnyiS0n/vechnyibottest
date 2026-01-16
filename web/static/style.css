@@ -1,178 +1,138 @@
-/* ===== Общие настройки ===== */
+/* ===== Цвета ===== */
+:root {
+    --bg: #f5f6fa;
+    --text: #222;
+    --card: #ffffff;
+    --accent: #4a6cf7;
+    --problem: #ff6b6b;
+}
+
+body.dark {
+    --bg: #0f172a;
+    --text: #e5e7eb;
+    --card: #1e293b;
+    --accent: #7c9cff;
+    --problem: #f87171;
+}
+
+/* ===== Базовые стили ===== */
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-    background: #f5f7fb;
     margin: 0;
-    padding: 0;
-    color: #222;
+    font-family: system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
 }
 
 a {
     text-decoration: none;
-    color: #4a6cf7;
+    color: inherit;
 }
 
-a:hover {
-    text-decoration: underline;
-}
-
-/* ===== Контейнер ===== */
-.container {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 0 20px;
-}
-
-/* ===== Карточки ===== */
-.card {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 20px 24px;
-    margin-bottom: 20px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-}
-
-/* ===== Заголовки ===== */
-h1 {
-    margin-top: 0;
-    font-size: 28px;
-}
-
-h2 {
-    font-size: 20px;
-    margin-top: 0;
-}
-
-/* ===== Форма ===== */
-form {
+/* ===== Верхняя панель ===== */
+.top-bar {
     display: flex;
-    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background: var(--card);
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
 }
 
-input[type="text"] {
-    flex: 1;
-    padding: 10px 12px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-}
-
-button {
-    background: #4a6cf7;
-    color: white;
-    border: none;
-    padding: 10px 16px;
-    font-size: 16px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #3b5be0;
-}
-
-/* ===== Списки ===== */
-ul {
-    list-style: none;
-    padding-left: 0;
-    margin: 0;
-}
-
-li {
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-}
-
-li:last-child {
-    border-bottom: none;
-}
-
-/* ===== Бейдж ===== */
-.badge {
-    display: inline-block;
-    background: #eef1ff;
-    color: #4a6cf7;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 14px;
-    margin-left: 6px;
+#theme-toggle {
+font-size: 20px;
+cursor: pointer;
+background: none;
+border: none;
 }
 
 /* ===== Статистика ===== */
 .stats {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    padding: 24px;
 }
 
-.stat-box {
-    flex: 1;
-    min-width: 150px;
-    background: #f9faff;
-    border-radius: 10px;
-    padding: 14px;
+.stat-card {
+    background: var(--card);
+    padding: 16px;
+    border-radius: 12px;
     text-align: center;
 }
 
-.stat-box span {
-    font-size: 14px;
-    color: #666;
+/* ===== Карточки ===== */
+.card {
+    background: var(--card);
+    padding: 20px;
+    border-radius: 12px;
 }
 
-.stat-box strong {
-    display: block;
-    font-size: 22px;
-    margin-top: 4px;
+.card.problem {
+    border-left: 6px solid var(--problem);
 }
 
-/* ===== ГРАФИКИ ===== */
-.chart {
-    margin-top: 12px;
+/* ===== Уроки ===== */
+.lessons {
+    padding: 0 24px;
 }
 
-.bar {
-    background: #e6e9f5;
-    border-radius: 999px;
-    overflow: hidden;
-    height: 18px;
-    margin-bottom: 10px;
-}
-
-.bar-fill {
-    height: 100%;
-    border-radius: 999px;
-    transition: width 0.6s ease;
-}
-
-.bar-like { background: #4caf50; }
-.bar-ok { background: #ffb300; }
-.bar-dislike { background: #e53935; }
-
-/* ===== ШКАЛА ОЦЕНКИ ===== */
-.rating-scale {
+.lesson-card {
     display: flex;
-    gap: 6px;
-    margin-top: 10px;
+    justify-content: space-between;
+    padding: 16px;
+    margin-bottom: 12px;
+    background: var(--card);
+    border-radius: 10px;
 }
 
-.rating-dot {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: #ddd;
+.badge {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
 }
 
-.rating-dot.active {
-    background: #4a6cf7;
+.badge.problem {
+    background: var(--problem);
+    color: white;
 }
 
-/* ===== НАЗАД ===== */
+.badge.ok {
+    background: #22c55e;
+    color: white;
+}
+
+/* ===== Аналитика ===== */
+.analysis {
+    padding: 24px;
+    display: grid;
+    gap: 16px;
+}
+
+.mood {
+    font-size: 20px;
+}
+
+.text-warning {
+    color: var(--problem);
+}
+
+.text-ok {
+    color: #22c55e;
+}
+
+/* ===== Прочее ===== */
+.empty {
+    padding: 40px;
+    text-align: center;
+    opacity: 0.7;
+}
+
 .back {
-    display: inline-block;
-    margin-bottom: 16px;
+    padding: 0 24px;
 }
 
-/* ===== ПРОБЛЕМНЫЙ УРОК ===== */
-.problem {
-    border-left: 6px solid #e53935;
+footer {
+    text-align: center;
+    padding: 20px;
+    opacity: 0.6;
 }

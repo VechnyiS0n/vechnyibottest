@@ -1,46 +1,95 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <title>Панель учителя</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <title>Панель учителя</title>
+
+    <!-- Подключаем общий CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<div class="container">
+<!-- ===== Верхняя панель ===== -->
+<header class="top-bar">
+    <h1>📊 Панель учителя</h1>
 
-  <h1>Панель учителя</h1>
+    <!-- Кнопка переключения темы -->
+    <button id="theme-toggle">🌙</button>
+</header>
 
-  <div class="card">
-    <h2>Создать урок</h2>
+<!-- ===== Общая информация ===== -->
+<section class="stats">
+    <div class="stat-card">
+        <h3>📚 Уроков</h3>
+        <p>{{ lessons|length }}</p>
+    </div>
 
-    <form method="post" action="/lessons/create">
-      <input
-        type="text"
-        name="title"
-        placeholder="Название урока (например: Алгебра, тема 3)"
-        required
-      >
-      <button type="submit">Создать</button>
-    </form>
-  </div>
+    <div class="stat-card">
+        <h3>📝 Всего оценок</h3>
+        <p>{{ total_feedback }}</p>
+    </div>
 
-  <div class="card">
+    <div class="stat-card">
+        <h3>⭐ Средняя оценка</h3>
+        <p>{{ avg_rating }}</p>
+    </div>
+</section>
+
+<!-- ===== Список уроков ===== -->
+<section class="lessons">
     <h2>Список уроков</h2>
 
-    <ul>
-      {% for l in lessons %}
-        <li>
-          <a href="/lessons/{{ l.code }}">{{ l.title }}</a>
-          <span class="badge">код: {{ l.code }}</span>
-        </li>
-      {% else %}
-        <li>Пока уроков нет</li>
-      {% endfor %}
-    </ul>
-  </div>
+    {% if lessons %}
+        {% for lesson in lessons %}
+            <a href="{{ url_for('lesson_page', lesson_id=lesson.id) }}" class="lesson-card">
+                <div>
+                    <h3>{{ lesson.title }}</h3>
+                    <small>Код урока: <b>{{ lesson.code }}</b></small>
+                </div>
 
-</div>
+                <!-- Индикатор проблем -->
+                {% if lesson.problem %}
+                    <span class="badge problem">⚠ Проблемный</span>
+                {% else %}
+                    <span class="badge ok">✓ Всё хорошо</span>
+                {% endif %}
+            </a>
+        {% endfor %}
+    {% else %}
+        <!-- Пустое состояние -->
+        <div class="empty">
+            📭 Пока нет созданных уроков<br>
+            Создайте первый урок, чтобы начать сбор обратной связи
+        </div>
+    {% endif %}
+</section>
+
+<footer>
+    Анонимная система оценки уроков • Индивидуальный проект
+</footer>
+
+<!-- ===== JS для темы ===== -->
+<script>
+    const toggleBtn = document.getElementById("theme-toggle");
+
+    // при загрузке страницы
+    if (localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark");
+        toggleBtn.textContent = "☀️";
+    }
+
+    toggleBtn.onclick = () => {
+        document.body.classList.toggle("dark");
+
+        if (document.body.classList.contains("dark")) {
+            localStorage.setItem("theme", "dark");
+            toggleBtn.textContent = "☀️";
+        } else {
+            localStorage.setItem("theme", "light");
+            toggleBtn.textContent = "🌙";
+        }
+    };
+</script>
 
 </body>
 </html>
