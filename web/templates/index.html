@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Панель учителя</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+  <h1>Панель учителя</h1>
+
+  <div class="card">
+    <h2>Создать урок</h2>
+
+    <form method="post" action="/lessons/create">
+      <input
+        type="text"
+        name="title"
+        placeholder="Название урока (например: Алгебра, тема 3)"
+        required
+      >
+      <button type="submit">Создать</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Список уроков</h2>
+
+    <ul>
+      {% for l in lessons %}
+        <li>
+          <a href="/lessons/{{ l.code }}">{{ l.title }}</a>
+          <span class="badge">код: {{ l.code }}</span>
+        </li>
+      {% else %}
+        <li>Пока уроков нет</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>

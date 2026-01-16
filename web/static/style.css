@@ -1,0 +1,178 @@
+/* ===== Общие настройки ===== */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: #f5f7fb;
+    margin: 0;
+    padding: 0;
+    color: #222;
+}
+
+a {
+    text-decoration: none;
+    color: #4a6cf7;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ===== Контейнер ===== */
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* ===== Карточки ===== */
+.card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+}
+
+/* ===== Заголовки ===== */
+h1 {
+    margin-top: 0;
+    font-size: 28px;
+}
+
+h2 {
+    font-size: 20px;
+    margin-top: 0;
+}
+
+/* ===== Форма ===== */
+form {
+    display: flex;
+    gap: 10px;
+}
+
+input[type="text"] {
+    flex: 1;
+    padding: 10px 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+button {
+    background: #4a6cf7;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #3b5be0;
+}
+
+/* ===== Списки ===== */
+ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+li {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+li:last-child {
+    border-bottom: none;
+}
+
+/* ===== Бейдж ===== */
+.badge {
+    display: inline-block;
+    background: #eef1ff;
+    color: #4a6cf7;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 14px;
+    margin-left: 6px;
+}
+
+/* ===== Статистика ===== */
+.stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.stat-box {
+    flex: 1;
+    min-width: 150px;
+    background: #f9faff;
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+}
+
+.stat-box span {
+    font-size: 14px;
+    color: #666;
+}
+
+.stat-box strong {
+    display: block;
+    font-size: 22px;
+    margin-top: 4px;
+}
+
+/* ===== ГРАФИКИ ===== */
+.chart {
+    margin-top: 12px;
+}
+
+.bar {
+    background: #e6e9f5;
+    border-radius: 999px;
+    overflow: hidden;
+    height: 18px;
+    margin-bottom: 10px;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.6s ease;
+}
+
+.bar-like { background: #4caf50; }
+.bar-ok { background: #ffb300; }
+.bar-dislike { background: #e53935; }
+
+/* ===== ШКАЛА ОЦЕНКИ ===== */
+.rating-scale {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.rating-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ddd;
+}
+
+.rating-dot.active {
+    background: #4a6cf7;
+}
+
+/* ===== НАЗАД ===== */
+.back {
+    display: inline-block;
+    margin-bottom: 16px;
+}
+
+/* ===== ПРОБЛЕМНЫЙ УРОК ===== */
+.problem {
+    border-left: 6px solid #e53935;
+}

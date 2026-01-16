@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS lessons (
+  id SERIAL PRIMARY KEY,
+  code VARCHAR(16) UNIQUE NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS feedback (
+  id SERIAL PRIMARY KEY,
+  lesson_id INT NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
+  mood VARCHAR(8) NOT NULL,      -- like / ok / dislike
+  rating INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  comment TEXT,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS questions (
+  id SERIAL PRIMARY KEY,
+  lesson_id INT NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
+  text TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
